@@ -1,32 +1,82 @@
-// src/surfaces/Conversations.js
 import React from "react";
-import { View, FlatList, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TextInput, Pressable } from "react-native";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { ListOfConvos } from "../../components/ListOfConvos";
 
-const MOCK_CONVOS = [
-  { id: '1', name: "Jakob Curtis", lastMessage: "Hey, how's it going?" },
-  { id: '2', name: "Charlie Kelly", lastMessage: "See you soon!" },
-];
+export const Conversations = ({ navigation }) => {
+  const headerHeight = useHeaderHeight();
+  const [text, onChangeText] = React.useState("");
 
-export const Conversations = ({ navigation }) => (
-  <View style={{ flex: 1 }}>
-    <FlatList
-      data={MOCK_CONVOS}
-      keyExtractor={item => item.id}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          style={styles.row}
-          onPress={() => navigation.navigate("Chat", { user: item.name })}
-        >
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.message}>{item.lastMessage}</Text>
-        </TouchableOpacity>
-      )}
-    />
-  </View>
-);
-
-const styles = StyleSheet.create({
-  row: { padding: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  name: { fontWeight: "bold" },
-  message: { color: "#888" },
-});
+  return (
+    <SafeAreaView style={{ flex: 1, paddingTop: headerHeight + 30 }}>
+      <View
+        style={{
+          width: 650,
+          height: 570,
+          borderRadius: 155,
+          borderWidth: 1,
+          borderColor: "#EEF2E2",
+          position: "absolute",
+          top: 210,
+          left: -160,
+          transform: [{ rotate: "-45deg" }],
+        }}
+      />
+      <View
+        style={{
+          width: 650,
+          height: 570,
+          borderRadius: 155,
+          borderWidth: 1,
+          borderColor: "#EEF2E2",
+          position: "absolute",
+          top: 280,
+          left: -160,
+          transform: [{ rotate: "-45deg" }],
+        }}
+      />
+      <View
+        style={{
+          width: 650,
+          height: 570,
+          borderRadius: 155,
+          position: "absolute",
+          top: 350,
+          left: -160,
+          backgroundColor: "#E1F6F4",
+          transform: [{ rotate: "-45deg" }],
+        }}
+      />
+      <View style={{ marginHorizontal: 30, position: "relative" }}>
+        <View>
+          <TextInput
+            style={{
+              fontSize: 14,
+              paddingVertical: 12,
+              paddingLeft: 40,
+              marginHorizontal: 17,
+              borderRadius: 15,
+              backgroundColor: "#ffffff",
+              shadowColor: "#000000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.1,
+              shadowRadius: 9,
+            }}
+            onChangeText={onChangeText}
+            value={text}
+            placeholder="search contacts"
+          />
+          <Ionicons
+            name="search"
+            size={24}
+            color="#000000"
+            style={{ position: "absolute", left: 28, top: 6 }}
+          />
+        </View>
+        <ListOfConvos navigation={navigation} />
+      </View>
+    </SafeAreaView>
+  );
+};
