@@ -4,7 +4,7 @@ import { View, FlatList, Text, Image, TouchableOpacity, StyleSheet } from "react
 
 const MOCK_POSTS = [
   { id: '1', user: "Jakob Curtis", image: require("../../assets/sunset.jpg"), likes: 8 },
-  { id: '2', user: "Charlie Kelly", image: require("../../assets/cocktail2.jpg"), likes: 5 },
+  { id: '2', user: "Charlie Kelly", image: require("../../assets/cocktail.jpg"), likes: 5 },
 ];
 
 export const Feed = ({ navigation }) => {
