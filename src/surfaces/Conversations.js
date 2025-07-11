@@ -1,82 +1,93 @@
-import React from "react";
-import { View, TextInput, Pressable } from "react-native";
+import React, { useState } from "react";
+import { View, Text, FlatList, TouchableOpacity, Image, TextInput, StyleSheet } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { ListOfConvos } from "../../components/ListOfConvos";
+import { useAppContext } from "../context/AppContext";
 
 export const Conversations = ({ navigation }) => {
   const headerHeight = useHeaderHeight();
-  const [text, onChangeText] = React.useState("");
+  const { members } = useAppContext();
+  const [search, setSearch] = useState("");
+
+  const filteredMembers = members.filter(m =>
+    m.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: headerHeight + 30 }}>
-      <View
-        style={{
-          width: 650,
-          height: 570,
-          borderRadius: 155,
-          borderWidth: 1,
-          borderColor: "#EEF2E2",
-          position: "absolute",
-          top: 210,
-          left: -160,
-          transform: [{ rotate: "-45deg" }],
-        }}
-      />
-      <View
-        style={{
-          width: 650,
-          height: 570,
-          borderRadius: 155,
-          borderWidth: 1,
-          borderColor: "#EEF2E2",
-          position: "absolute",
-          top: 280,
-          left: -160,
-          transform: [{ rotate: "-45deg" }],
-        }}
-      />
-      <View
-        style={{
-          width: 650,
-          height: 570,
-          borderRadius: 155,
-          position: "absolute",
-          top: 350,
-          left: -160,
-          backgroundColor: "#E1F6F4",
-          transform: [{ rotate: "-45deg" }],
-        }}
-      />
-      <View style={{ marginHorizontal: 30, position: "relative" }}>
-        <View>
-          <TextInput
-            style={{
-              fontSize: 14,
-              paddingVertical: 12,
-              paddingLeft: 40,
-              marginHorizontal: 17,
-              borderRadius: 15,
-              backgroundColor: "#ffffff",
-              shadowColor: "#000000",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.1,
-              shadowRadius: 9,
-            }}
-            onChangeText={onChangeText}
-            value={text}
-            placeholder="search contacts"
-          />
-          <Ionicons
-            name="search"
-            size={24}
-            color="#000000"
-            style={{ position: "absolute", left: 28, top: 6 }}
-          />
-        </View>
-        <ListOfConvos navigation={navigation} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8FF", paddingTop: headerHeight }}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Conversations</Text>
+        <TextInput
+          style={styles.search}
+          placeholder="Rechercher un membre..."
+          value={search}
+          onChangeText={setSearch}
+        />
       </View>
+      <FlatList
+        data={filteredMembers}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() =>
+              navigation.navigate("Messages", { name: item.name, avatar: item.avatar, memberId: item.id })
+            }
+          >
+            <Image source={{ uri: item.avatar }} style={styles.avatar} />
+            <View>
+              <Text style={styles.username}>{item.name}</Text>
+              <Text style={styles.lastMessage}>{item.lastMessage}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  header: {
+    backgroundColor: "#fff",
+    paddingBottom: 8,
+    paddingTop: 8,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    marginBottom: 4,
+    elevation: 2,
+  },
+  title: {
+    fontWeight: "bold",
+    fontSize: 26,
+    color: "#B388FF",
+    marginLeft: 18,
+    marginBottom: 2,
+  },
+  search: {
+    backgroundColor: "#F8F8FF",
+    borderRadius: 14,
+    padding: 12,
+    marginHorizontal: 18,
+    marginBottom: 10,
+    borderColor: "#EDEDED",
+    borderWidth: 1,
+    fontSize: 15,
+  },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    marginHorizontal: 12,
+    marginVertical: 8,
+    padding: 14,
+    shadowColor: "#B388FF",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  avatar: { width: 54, height: 54, borderRadius: 27, marginRight: 16, borderWidth: 2, borderColor: "#B388FF" },
+  username: { fontWeight: "bold", color: "#B388FF", fontSize: 16 },
+  lastMessage: { color: "#888", fontSize: 13 },
+});
