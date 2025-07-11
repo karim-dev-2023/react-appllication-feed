@@ -41,11 +41,14 @@ export const AppProvider = ({ children }) => {
   const [conversations, setConversations] = useState([]);
 
   // Génère 50 membres random et des posts random
-  useEffect(() => {
-    const fetchMembersAndPosts = async () => {
+useEffect(() => {
+  const fetchMembersAndPosts = async () => {
+    try {
+      // 1. Récupérer 50 utilisateurs aléatoires
       const res = await fetch("https://randomuser.me/api/?results=50");
       const data = await res.json();
-      const randomMembers = data.results.map(u => ({
+
+      const randomMembers = data.results.map((u) => ({
         id: u.login.uuid,
         name: `${u.name.first} ${u.name.last}`,
         avatar: u.picture.medium,
@@ -53,19 +56,29 @@ export const AppProvider = ({ children }) => {
       }));
       setMembers(randomMembers);
 
+      // 2. Récupérer des images depuis l’API Pexels
+      const imgRes = await fetch("https://api.pexels.com/v1/curated?per_page=50", {
+        headers: {
+          Authorization: "NV9YLpw3o3zCQqsMQ56lE2K6c6yRXA5OHeUs6a0IsKivcR11xLGlR0aq"
+        }
+      });
+      const imgData = await imgRes.json();
+      const imageList = imgData.photos;
+
+      // 3. Générer les posts avec les images Pexels
       const randomPosts = data.results.map((u, i) => ({
         id: u.login.uuid,
         user: `${u.name.first} ${u.name.last}`,
         userAvatar: u.picture.medium,
-        image: { uri: `https://source.unsplash.com/random/400x400?sig=${i}` },
+        image: { uri: imageList[i % imageList.length].src.large }, // ou .medium
         caption: getRandomCaption(),
         date: new Date().toLocaleDateString(),
         likes: Math.floor(Math.random() * 100),
         authorId: u.login.uuid,
       }));
 
-      // Ajoute aussi tes images locales
-      localImages.forEach((img, idx) => {
+      // 4. Ajouter les images locales
+      localImages.forEach((img) => {
         randomPosts.push({
           id: img.key,
           user: "Selsabil",
@@ -78,10 +91,16 @@ export const AppProvider = ({ children }) => {
         });
       });
 
+      // 5. Mise à jour du state
       setPosts(randomPosts.reverse());
-    };
-    fetchMembersAndPosts();
-  }, []);
+    } catch (error) {
+      console.error("Erreur de chargement des membres ou des images :", error);
+    }
+  };
+
+  fetchMembersAndPosts();
+}, []);
+
 
   // Ajout d'un post
   const publishPost = (caption, imageUri) => {
@@ -110,7 +129,10 @@ export const AppProvider = ({ children }) => {
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId
-          ? { ...p, likes: favorites.includes(postId) ? p.likes - 1 : p.likes + 1 }
+          ? {
+              ...p,
+              likes: favorites.includes(postId) ? p.likes - 1 : p.likes + 1,
+            }
           : p
       )
     );
