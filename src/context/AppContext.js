@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { images as localImages } from "../../assets/images";
 
+
 const AppContext = createContext();
 
 const randomCaptions = [
@@ -28,7 +29,7 @@ export const AppProvider = ({ children }) => {
     id: "local-selsabil",
     username: "Selsabil",
     handle: "@selsabil",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    avatar: "https://randomuser.me/api/portraits/women/45.jpg",
     bio: "🌸 Passionnée de voyages, d’art et de moments simples. Bienvenue sur mon univers pastel !",
     followers: 1200,
     following: 340,

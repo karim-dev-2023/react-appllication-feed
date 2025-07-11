@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, Modal, TextInput, Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAppContext } from "../context/AppContext";
+import avatar from "../../assets/avatar-account-icon.jpg";
 
 const { width } = Dimensions.get("window");
 const CARD_MARGIN = 12;
@@ -30,7 +31,7 @@ export const Profile = () => {
   return (
     <LinearGradient colors={["#E1F6F4", "#F5C8C6"]} style={{ flex: 1 }}>
       <View style={styles.header}>
-        <Image source={{ uri: user.avatar }} style={styles.avatar} />
+        <Image source={ avatar } style={styles.avatar} />
         <Text style={styles.username}>{user.username}</Text>
         <Text style={styles.handle}>{user.handle}</Text>
         <Text style={styles.bio}>{user.bio}</Text>
