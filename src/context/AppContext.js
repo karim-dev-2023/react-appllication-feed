@@ -50,11 +50,21 @@ export const AppProvider = ({ children }) => {
       }));
       setMembers(randomMembers);
 
+      // 2. Récupérer des images depuis l’API Pexels
+      const imgRes = await fetch("https://api.pexels.com/v1/curated?per_page=50", {
+        headers: {
+          Authorization: "NV9YLpw3o3zCQqsMQ56lE2K6c6yRXA5OHeUs6a0IsKivcR11xLGlR0aq"
+        }
+      });
+      const imgData = await imgRes.json();
+      const imageList = imgData.photos;
+
+      // 3. Générer les posts avec les images Pexels
       const randomPosts = data.results.map((u, i) => ({
         id: u.login.uuid,
         user: `${u.name.first} ${u.name.last}`,
         userAvatar: u.picture.medium,
-        image: { uri: `https://source.unsplash.com/random/400x400?sig=${i}` },
+        image: { uri: imageList[i % imageList.length].src.large }, // ou .medium
         caption: getRandomCaption(),
         date: new Date().toLocaleDateString(),
         likes: Math.floor(Math.random() * 100),
@@ -74,6 +84,7 @@ export const AppProvider = ({ children }) => {
         });
       });
 
+      // 5. Mise à jour du state
       setPosts(randomPosts.reverse());
     };
 
