@@ -11,7 +11,7 @@ const Stack = createStackNavigator();
 function AppEntry() {
   const { isAuthenticated } = useAppContext();
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false }} >
       {isAuthenticated ? (
         <Stack.Screen name="Home" component={Home} />
       ) : (

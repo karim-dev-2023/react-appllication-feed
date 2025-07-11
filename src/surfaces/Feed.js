@@ -1,5 +1,12 @@
 import React from "react";
-import { View, FlatList, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  FlatList,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAppContext } from "../context/AppContext";
 
@@ -8,12 +15,21 @@ export const Feed = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F8F8FF" }}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Feed</Text>
+      </View>
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 8,
+              }}
+            >
               <Image source={{ uri: item.userAvatar }} style={styles.avatar} />
               <View>
                 <Text style={styles.username}>{item.user}</Text>
@@ -23,7 +39,10 @@ export const Feed = () => {
             <Image source={item.image} style={styles.image} />
             <Text style={styles.caption}>{item.caption}</Text>
             <View style={styles.likeRow}>
-              <TouchableOpacity onPress={() => toggleFavorite(item.id)} style={styles.likeIcon}>
+              <TouchableOpacity
+                onPress={() => toggleFavorite(item.id)}
+                style={styles.likeIcon}
+              >
                 <Ionicons
                   name={favorites.includes(item.id) ? "heart" : "heart-outline"}
                   size={26}
@@ -40,6 +59,20 @@ export const Feed = () => {
 };
 
 const styles = StyleSheet.create({
+  header: {
+    backgroundColor: "#fff",
+    paddingTop: 50, // pour simuler un espace de status bar
+    paddingBottom: 12,
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEE",
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#B388FF",
+  },
+
   card: {
     backgroundColor: "#fff",
     borderRadius: 20,
@@ -51,7 +84,14 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 3,
   },
-  avatar: { width: 44, height: 44, borderRadius: 22, marginRight: 12, borderWidth: 2, borderColor: "#B388FF" },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    marginRight: 12,
+    borderWidth: 2,
+    borderColor: "#B388FF",
+  },
   username: { fontWeight: "bold", fontSize: 16, color: "#B388FF" },
   date: { color: "#888", fontSize: 12 },
   image: { width: "100%", height: 220, borderRadius: 16, marginVertical: 10 },

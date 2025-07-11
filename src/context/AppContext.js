@@ -125,8 +125,7 @@ export const AppProvider = ({ children }) => {
       )
     );
   };
-
-  // ✅ Corrigé ici
+  
   const sendMessage = (toUserId, text, memberId = null, fromBot = false) => {
     setConversations((prev) => {
       const userId = fromBot ? toUserId : user.id;
