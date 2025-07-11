@@ -28,7 +28,7 @@ export const Home = () => {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#B388FF",
+        tabBarActiveTintColor: "#b972c2",
         tabBarInactiveTintColor: "#EDEDED",
         headerShown: false,
         tabBarStyle: {

@@ -26,7 +26,7 @@ export const AppProvider = ({ children }) => {
     id: "local-selsabil",
     username: "Selsabil",
     handle: "@selsabil",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    avatar: null, // Icône user par défaut
     bio: "🌸 Passionnée de voyages, d’art et de moments simples. Bienvenue sur mon univers pastel !",
     followers: 1200,
     following: 340,
@@ -36,6 +36,7 @@ export const AppProvider = ({ children }) => {
   const [members, setMembers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [saved, setSaved] = useState([]);
   const [conversations, setConversations] = useState([]);
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export const AppProvider = ({ children }) => {
       const randomMembers = data.results.map((u) => ({
         id: u.login.uuid,
         name: `${u.name.first} ${u.name.last}`,
-        avatar: u.picture.medium,
+        avatar: null, // Icône user pour tous les membres
         lastMessage: "Démarre une conversation !",
       }));
       setMembers(randomMembers);
@@ -63,8 +64,8 @@ export const AppProvider = ({ children }) => {
       const randomPosts = data.results.map((u, i) => ({
         id: u.login.uuid,
         user: `${u.name.first} ${u.name.last}`,
-        userAvatar: u.picture.medium,
-        image: { uri: imageList[i % imageList.length].src.large }, // ou .medium
+        userAvatar: null, // Icône user pour tous les autres
+        image: { uri: imageList[i % imageList.length].src.large },
         caption: getRandomCaption(),
         date: new Date().toLocaleDateString(),
         likes: Math.floor(Math.random() * 100),
@@ -74,8 +75,8 @@ export const AppProvider = ({ children }) => {
       localImages.forEach((img) => {
         randomPosts.push({
           id: img.key,
-          user: "Selsabil",
-          userAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
+          user: "Selsabil Amairi",
+          userAvatar: user.avatar, // Ton avatar (null par défaut)
           image: img.source,
           caption: img.caption,
           date: new Date().toLocaleDateString(),
@@ -84,11 +85,11 @@ export const AppProvider = ({ children }) => {
         });
       });
 
-      // 5. Mise à jour du state
       setPosts(randomPosts.reverse());
     };
 
     fetchMembersAndPosts();
+    // eslint-disable-next-line
   }, []);
 
   const publishPost = (caption, imageUri) => {
@@ -125,7 +126,21 @@ export const AppProvider = ({ children }) => {
     );
   };
 
-  // ✅ Corrigé ici
+  const toggleSaved = (postId) => {
+    setSaved((prev) =>
+      prev.includes(postId)
+        ? prev.filter((id) => id !== postId)
+        : [...prev, postId]
+    );
+  };
+
+  const deletePost = (postId) => {
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+    setFavorites((prev) => prev.filter((id) => id !== postId));
+    setSaved((prev) => prev.filter((id) => id !== postId));
+  };
+
+  // --- Conversation, login, register, logout, updateProfile ---
   const sendMessage = (toUserId, text, memberId = null, fromBot = false) => {
     setConversations((prev) => {
       const userId = fromBot ? toUserId : user.id;
@@ -185,13 +200,36 @@ export const AppProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  const updateProfile = (newUsername, newPassword) => {
+  const updateProfile = (newUsername, newPassword, newAvatar) => {
     setUser((prev) => ({
       ...prev,
       username: newUsername || prev.username,
       handle: `@${newUsername || prev.username}`,
       password: newPassword || prev.password,
+      avatar: typeof newAvatar !== "undefined" ? newAvatar : prev.avatar,
     }));
+
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.authorId === user.id
+          ? {
+              ...post,
+              user: newUsername || user.username,
+              userAvatar: typeof newAvatar !== "undefined" ? newAvatar : user.avatar,
+            }
+          : post
+      )
+    );
+  };
+
+  const reorderMyPosts = (newOrder) => {
+    const myIds = newOrder.map((p) => p.id);
+    setPosts((prev) => {
+      const myPosts = prev.filter((p) => p.authorId === user.id);
+      const others = prev.filter((p) => p.authorId !== user.id);
+      const sortedMyPosts = myIds.map((id) => myPosts.find((p) => p.id === id)).filter(Boolean);
+      return [...sortedMyPosts, ...others];
+    });
   };
 
   return (
@@ -201,9 +239,13 @@ export const AppProvider = ({ children }) => {
         members,
         posts,
         favorites,
+        saved,
         conversations,
         publishPost,
         toggleFavorite,
+        toggleSaved,
+        deletePost,
+        reorderMyPosts,
         sendMessage,
         isAuthenticated,
         login,

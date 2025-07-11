@@ -5,6 +5,7 @@ import { AppProvider, useAppContext } from "./src/context/AppContext";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Home } from "./src/surfaces/Home";
 import Login from "./src/surfaces/Login";
+import FlashMessage from "react-native-flash-message"; // ⚡️ Ajout ici
 
 const Stack = createStackNavigator();
 
@@ -28,6 +29,8 @@ export default function App() {
         <NavigationContainer>
           <AppEntry />
         </NavigationContainer>
+        {/* ⚡️ Ajoute FlashMessage ici pour les notifications globales */}
+        <FlashMessage position="top" />
       </AppProvider>
     </SafeAreaProvider>
   );

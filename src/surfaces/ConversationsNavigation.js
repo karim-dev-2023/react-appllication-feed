@@ -5,9 +5,7 @@ import { Messages } from "./Messages";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 
-// Importe ton logo
 const iconLogin = require("../../assets/icone-login.png");
-
 const Stack = createStackNavigator();
 
 export const ConversationsNavigation = () => (
@@ -17,11 +15,10 @@ export const ConversationsNavigation = () => (
       component={Conversations}
       options={{
         headerBackTitleVisible: false,
-        headerTintColor: "#B388FF",
+        headerTintColor: "#b972c2",
         headerTransparent: false,
         headerTitleAlign: "center",
-        headerStyle: { height: 100, backgroundColor: "#fff" },
-        // LOGO à gauche
+        headerStyle: { height: 90, backgroundColor: "#fff6fa" },
         headerLeft: () => (
           <View style={{ marginLeft: 16 }}>
             <Image
@@ -31,29 +28,26 @@ export const ConversationsNavigation = () => (
             />
           </View>
         ),
-        // TITRE centré
         headerTitle: () => (
           <Text
             style={{
               fontWeight: "bold",
               fontSize: 24,
-              color: "#B388FF",
+              color: "#b972c2",
               letterSpacing: 0.5,
             }}
           >
             Conversations
           </Text>
         ),
-        // ICONE à droite
         headerRight: () => (
           <TouchableOpacity
             onPress={() => {
-              // Action personnalisée à droite
               alert("Nouvelle conversation !");
             }}
             style={{ marginRight: 16 }}
           >
-            <Ionicons name="chatbubble-ellipses" size={28} color="#B388FF" />
+            <Ionicons name="chatbubble-ellipses" size={28} color="#b972c2" />
           </TouchableOpacity>
         ),
       }}
@@ -62,7 +56,7 @@ export const ConversationsNavigation = () => (
       name="ConversationMessages"
       component={Messages}
       options={{
-        headerShown: false, // Header custom dans Messages.js
+        headerShown: false,
       }}
     />
   </Stack.Navigator>

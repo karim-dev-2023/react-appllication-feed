@@ -32,7 +32,7 @@ export const images = [
   {
     key: "flowers",
     source: require("../assets/flowers.jpg"),
-    caption: "Bouquet pastel",
+    caption: "Nails color with flowers",
     bio: "La beauté des fleurs, tout simplement.",
   },
   {
@@ -87,7 +87,7 @@ export const images = [
     key: "petit dej-bali",
     source: require("../assets/petit dej-bali.jpg"),
     caption: "Bali vibes",
-    bio: "Petit-déjeuner dans un décor de rêve.",
+    bio: "Breakfat dans un décor de rêve.",
   },
   {
     key: "pink-porshe",

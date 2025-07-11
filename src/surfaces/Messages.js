@@ -26,13 +26,10 @@ export const Messages = ({ route, navigation }) => {
   const { name, avatar, memberId } = route.params;
 
   const [text, setText]      = useState("");
-  const [botStep, setBotStep] = useState(0);   // 0 ➜ rien envoyé, 4 ➜ fin
+  const [botStep, setBotStep] = useState(0);
   const flatListRef          = useRef();
   const insets               = useSafeAreaInsets();
 
-  /* ------------------------------------------------------------------ */
-  /*  Récupère la conversation courante et ses messages                 */
-  /* ------------------------------------------------------------------ */
   const conv = conversations.find(
     c =>
       (c.user1 === user.id && c.user2 === memberId) ||
@@ -40,71 +37,54 @@ export const Messages = ({ route, navigation }) => {
   );
   const messages = conv ? conv.messages : [];
 
-  /* ------------------------------------------------------------------ */
-  /*  Fonction utilitaire : envoie un message du bot                    */
-  /* ------------------------------------------------------------------ */
   const sendBotMessage = (stepIndex) => {
-    // (destId,       texte,           fromId,   isBot)
     sendMessage(user.id, BOT_STEPS[stepIndex], memberId, true);
     setBotStep(stepIndex + 1);
   };
 
-  /* ------------------------------------------------------------------ */
-  /*  1) Au premier affichage : le bot dit “Bonjour...”                 */
-  /* ------------------------------------------------------------------ */
   useEffect(() => {
     if (botStep === 0) {
-      sendBotMessage(0); // envoie « Bonjour, comment ça va ? »
+      sendBotMessage(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ------------------------------------------------------------------ */
-  /*  2) Chaque fois que l’utilisateur répond, le bot envoie la suite   */
-  /* ------------------------------------------------------------------ */
   useEffect(() => {
     if (messages.length === 0) return;
-
     const lastMsg = messages[messages.length - 1];
-
-    // Si le dernier message vient de l’utilisateur et qu'il reste des étapes
     if (lastMsg.from === user.id && botStep < BOT_STEPS.length) {
       setTimeout(() => sendBotMessage(botStep), 900);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
-  /* ------------------------------------------------------------------ */
-  /*  3) Gestion de l’envoi par l’utilisateur                           */
-  /* ------------------------------------------------------------------ */
-  const canSend = botStep < BOT_STEPS.length;        // désactive à la fin
+  const canSend = botStep < BOT_STEPS.length;
 
   const handleSend = () => {
     if (!canSend || !text.trim()) return;
-    sendMessage(memberId, text);   // ton message au destinataire
+    sendMessage(memberId, text);
     setText("");
   };
 
-  /* ------------------------------------------------------------------ */
-  /*  4) Scroll automatique vers le bas                                 */
-  /* ------------------------------------------------------------------ */
   useEffect(() => {
     if (flatListRef.current) flatListRef.current.scrollToEnd({ animated: true });
   }, [messages]);
 
-  /* =========================== RENDER =============================== */
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8FF" }} edges={["left", "right", "top"]}>
-      {/* ---------- Header ---------- */}
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff6fa" }} edges={["left", "right", "top"]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={28} color="#B388FF" />
+          <Ionicons name="chevron-back" size={28} color="#b972c2" />
         </TouchableOpacity>
-        <Image source={{ uri: avatar }} style={styles.avatar} />
+        {avatar ? (
+          <Image source={{ uri: avatar }} style={styles.avatar} />
+        ) : (
+          <View style={styles.avatarNoPhoto}>
+            <Ionicons name="person-circle" size={36} color="#b972c2" />
+          </View>
+        )}
         <Text style={styles.username} numberOfLines={1}>{name}</Text>
       </View>
-
-      {/* ---------- Messages + input ---------- */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -134,7 +114,7 @@ export const Messages = ({ route, navigation }) => {
             value={text}
             onChangeText={setText}
             placeholder="Message..."
-            placeholderTextColor="#B388FF"
+            placeholderTextColor="#b972c2"
             editable={canSend}
             returnKeyType="send"
             onSubmitEditing={handleSend}
@@ -148,7 +128,6 @@ export const Messages = ({ route, navigation }) => {
   );
 };
 
-/* =========================== STYLES =============================== */
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
@@ -160,7 +139,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     paddingHorizontal: 16,
     elevation: 2,
-    shadowColor: "#B388FF",
+    shadowColor: "#b972c2",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
@@ -169,29 +148,38 @@ const styles = StyleSheet.create({
   backBtn: { marginRight: 6, padding: 4 },
   avatar: {
     width: 44, height: 44, borderRadius: 22,
-    borderWidth: 2, borderColor: "#B388FF",
-    marginRight: 12, backgroundColor: "#F8F8FF",
+    borderWidth: 2, borderColor: "#b972c2",
+    marginRight: 12, backgroundColor: "#fff",
   },
-  username: { fontWeight: "bold", fontSize: 18, color: "#B388FF", flex: 1, minWidth: 0 },
-
+  avatarNoPhoto: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: "#b972c2",
+    backgroundColor: "#E1F6F4",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  username: { fontWeight: "bold", fontSize: 18, color: "#b972c2", flex: 1, minWidth: 0 },
   bubble: { borderRadius: 16, marginVertical: 6, padding: 12, maxWidth: "75%" },
   bubbleMe: {
     alignSelf: "flex-end",
-    backgroundColor: "#B388FF",           // toi ➜ à droite, fond violet
+    backgroundColor: "#b972c2",
   },
   bubbleOther: {
     alignSelf: "flex-start",
-    backgroundColor: "#fff",              // bot ➜ à gauche, fond blanc
+    backgroundColor: "#fff",
     borderWidth: 1, borderColor: "#E1F6F4",
   },
-
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",
     borderTopWidth: 1, borderColor: "#E1F6F4",
     paddingHorizontal: 12, paddingVertical: 10, minHeight: 56,
-    shadowColor: "#B388FF",
+    shadowColor: "#b972c2",
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.09,
     shadowRadius: 6,
@@ -202,13 +190,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 12,
     borderWidth: 1,
-    borderColor: "#B388FF",
+    borderColor: "#b972c2",
     marginRight: 8,
     fontSize: 16,
     color: "#22223B",
   },
   sendBtn: {
-    backgroundColor: "#B388FF",
+    backgroundColor: "#b972c2",
     borderRadius: 16,
     padding: 12,
     elevation: 2,

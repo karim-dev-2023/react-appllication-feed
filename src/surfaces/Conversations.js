@@ -8,7 +8,6 @@ import {
   TextInput,
   StyleSheet,
   Animated,
-  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppContext } from "../context/AppContext";
@@ -19,7 +18,6 @@ export const Conversations = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [fadeAnim] = useState(new Animated.Value(0));
 
-  // Animation d’apparition
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -28,7 +26,6 @@ export const Conversations = ({ navigation }) => {
     }).start();
   }, []);
 
-  // Récupère le dernier message échangé avec chaque membre
   const getLastMessage = (memberId) => {
     const conv = conversations.find(
       (c) =>
@@ -41,7 +38,6 @@ export const Conversations = ({ navigation }) => {
     return "Démarre une conversation !";
   };
 
-  // Trie les membres avec qui on a déjà discuté en haut
   const sortedMembers = [...members]
     .sort((a, b) => {
       const aConv = conversations.find(
@@ -61,20 +57,18 @@ export const Conversations = ({ navigation }) => {
     );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8FF" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff6fa" }}>
       <Animated.View style={{ opacity: fadeAnim }}>
-        {/* Barre de recherche */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#B388FF" style={{ marginRight: 8 }} />
+          <Ionicons name="search" size={20} color="#b972c2" style={{ marginRight: 8 }} />
           <TextInput
             style={styles.searchInput}
             placeholder="Rechercher un membre..."
-            placeholderTextColor="#B388FF"
+            placeholderTextColor="#b972c2"
             value={search}
             onChangeText={setSearch}
           />
         </View>
-        {/* Liste des conversations */}
         <FlatList
           data={sortedMembers}
           keyExtractor={(item) => item.id}
@@ -91,7 +85,13 @@ export const Conversations = ({ navigation }) => {
                 })
               }
             >
-              <Image source={{ uri: item.avatar }} style={styles.avatar} />
+              {item.avatar ? (
+                <Image source={{ uri: item.avatar }} style={styles.avatar} />
+              ) : (
+                <View style={styles.avatarNoPhoto}>
+                  <Ionicons name="person-circle" size={36} color="#b972c2" />
+                </View>
+              )}
               <View style={{ flex: 1 }}>
                 <Text style={styles.username}>{item.name}</Text>
                 <Text
@@ -101,7 +101,7 @@ export const Conversations = ({ navigation }) => {
                   {getLastMessage(item.id)}
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={22} color="#B388FF" />
+              <Ionicons name="chevron-forward" size={22} color="#b972c2" />
             </TouchableOpacity>
           )}
           ListEmptyComponent={
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     paddingHorizontal: 12,
     paddingVertical: 7,
-    shadowColor: "#B388FF",
+    shadowColor: "#b972c2",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 6,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     marginVertical: 7,
     paddingVertical: 13,
     paddingHorizontal: 14,
-    shadowColor: "#B388FF",
+    shadowColor: "#b972c2",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.10,
     shadowRadius: 8,
@@ -155,27 +155,38 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    marginRight: 14,
     borderWidth: 2,
-    borderColor: "#B388FF",
-    backgroundColor: "#F8F8FF",
+    borderColor: "#b972c2",
+    marginRight: 14,
+    backgroundColor: "#fff",
+  },
+  avatarNoPhoto: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 2,
+    borderColor: "#b972c2",
+    backgroundColor: "#E1F6F4",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 14,
   },
   username: {
     fontWeight: "bold",
     fontSize: 17,
-    color: "#B388FF",
+    color: "#b972c2",
     marginBottom: 2,
     letterSpacing: 0.1,
   },
   lastMessage: {
-    color: "#888",
+    color: "#7f6b8b",
     fontSize: 14,
     maxWidth: 210,
   },
   emptyText: {
     textAlign: "center",
     marginTop: 32,
-    color: "#B388FF",
+    color: "#b972c2",
     fontWeight: "bold",
     fontSize: 17,
     opacity: 0.7,
