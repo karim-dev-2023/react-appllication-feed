@@ -21,10 +21,8 @@ function getRandomCaption() {
 }
 
 export const AppProvider = ({ children }) => {
-  // Auth state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // User state
   const [user, setUser] = useState({
     id: "local-selsabil",
     username: "Selsabil",
@@ -33,7 +31,7 @@ export const AppProvider = ({ children }) => {
     bio: "🌸 Passionnée de voyages, d’art et de moments simples. Bienvenue sur mon univers pastel !",
     followers: 1200,
     following: 340,
-    password: "123456", // Ajout pour démo
+    password: "123456",
   });
 
   const [members, setMembers] = useState([]);
@@ -41,14 +39,10 @@ export const AppProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
   const [conversations, setConversations] = useState([]);
 
-  // Génère 50 membres random et des posts random
-useEffect(() => {
-  const fetchMembersAndPosts = async () => {
-    try {
-      // 1. Récupérer 50 utilisateurs aléatoires
+  useEffect(() => {
+    const fetchMembersAndPosts = async () => {
       const res = await fetch("https://randomuser.me/api/?results=50");
       const data = await res.json();
-
       const randomMembers = data.results.map((u) => ({
         id: u.login.uuid,
         name: `${u.name.first} ${u.name.last}`,
@@ -78,7 +72,6 @@ useEffect(() => {
         authorId: u.login.uuid,
       }));
 
-      // 4. Ajouter les images locales
       localImages.forEach((img) => {
         randomPosts.push({
           id: img.key,
@@ -94,16 +87,11 @@ useEffect(() => {
 
       // 5. Mise à jour du state
       setPosts(randomPosts.reverse());
-    } catch (error) {
-      console.error("Erreur de chargement des membres ou des images :", error);
-    }
-  };
+    };
 
-  fetchMembersAndPosts();
-}, []);
+    fetchMembersAndPosts();
+  }, []);
 
-
-  // Ajout d'un post
   const publishPost = (caption, imageUri) => {
     if (!caption || !imageUri) return false;
     const newPost = {
@@ -120,7 +108,6 @@ useEffect(() => {
     return true;
   };
 
-  // Like/unlike
   const toggleFavorite = (postId) => {
     setFavorites((prev) =>
       prev.includes(postId)
@@ -139,33 +126,44 @@ useEffect(() => {
     );
   };
 
-  // Messagerie (ultra simple)
-  const sendMessage = (toUserId, text) => {
+  // ✅ Corrigé ici
+  const sendMessage = (toUserId, text, memberId = null, fromBot = false) => {
     setConversations((prev) => {
-      const conv = prev.find(
+      const userId = fromBot ? toUserId : user.id;
+      const recipientId = fromBot ? user.id : toUserId;
+
+      const convIndex = prev.findIndex(
         (c) =>
-          (c.user1 === user.id && c.user2 === toUserId) ||
-          (c.user2 === user.id && c.user1 === toUserId)
+          (c.user1 === userId && c.user2 === recipientId) ||
+          (c.user2 === userId && c.user1 === recipientId)
       );
-      if (conv) {
-        conv.messages.push({ from: user.id, text, date: new Date() });
-        return [...prev];
+
+      if (convIndex !== -1) {
+        const conv = prev[convIndex];
+        if (conv.messages.length >= 5) {
+          return prev;
+        }
+        const updatedConv = {
+          ...conv,
+          messages: [...conv.messages, { from: userId, text, date: new Date() }],
+        };
+        const newConvs = [...prev];
+        newConvs[convIndex] = updatedConv;
+        return newConvs;
       } else {
         return [
           ...prev,
           {
-            user1: user.id,
-            user2: toUserId,
-            messages: [{ from: user.id, text, date: new Date() }],
+            user1: userId,
+            user2: recipientId,
+            messages: [{ from: userId, text, date: new Date() }],
           },
         ];
       }
     });
   };
 
-  // Authentification
   const login = (username, password) => {
-    // Ici, tu pourrais vérifier dans une base ou API
     if (username === user.username && password === user.password) {
       setIsAuthenticated(true);
       return true;
